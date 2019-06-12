@@ -22,7 +22,7 @@ out = zeros(maxcells, size_t);
 for t=1:size_t
     fluoVec = fluoInfo{r,z,t,c};
     nbcells = length(fluoVec);
-    out(:,t) = [fluoVec, zeros(maxcells-nbcells, 1)];    
+    out(:,t) = [fluoVec; zeros(maxcells-nbcells, 1)];    
 end
 
 end

@@ -22,7 +22,7 @@ out = zeros(maxcells, size_t);
 for t=1:size_t
     areaVec = areaInfo{r,z,t,c};
     nbcells = length(areaVec);
-    out(:,t) = [areaVec, zeros(maxcells-nbcells, 1)];    
+    out(:,t) = [areaVec; zeros(maxcells-nbcells, 1)];    
 end
 
 end
