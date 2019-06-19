@@ -26,13 +26,13 @@ for cell = allCurrCells
     
 %     % Check if new cell (i.e. matches to background), set it to max+1
       corr = allPrevCells(maxCountIx);
-%     if corr <= 0
-%         corresp(cell) = max([allPrevCells, corresp']) + 1;
-%     else
-%         corresp(cell) = corr;
-%     end
+    if corr <= 0
+        corresp(cell) = max([allPrevCells, corresp']) + 1;
+    else
+        corresp(cell) = corr;
+    end
     % commenting the above snippet creates a memory of background
-    corresp(cell) = corr;
+    % corresp(cell) = corr;
     allMaxCounts(cell) = maxCounts;
 end
 

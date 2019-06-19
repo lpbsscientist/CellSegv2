@@ -1,5 +1,4 @@
 function [mask] = getBackgroundGUI(fluo, param)
-% smoothing = 5, dilate = 0
 smoothed = imgaussfilt(fluo, param.smoothing);
 
 % Get otsu threshold
