@@ -154,11 +154,43 @@ The `mf.meta` slot contains a structure of all metadata needed by the algorithms
 
 ## 6. Behind The Scenes
 
-In the following section, we will explain how the main algorithms do their work. 
+In the following section, we will explain how the main algorithms do their work and what parameters they use. When naming the parameters, we refer to their slot in the (previously described) `mf.meta.param` Matlab struct. Moreover, we point to where the algorithms may fail, and how. 
+
+### Background Identification
+
+All subsequent algorithms rely on the detection of regions we are sure to be background. This is done using the image of the background fluorescence, which is first smoothed using a gaussian filter with high variance  determined by `.bg.smoothing` (default value: 5). The resulting image is thresholded using OTSU thresholding, yielding a binary image identifying regions of the cell which emit background fluorescence and are thus cellular. The resulting mask is then dilated with a large parameter `.bg.dilate` (default: 10), drawing large margins around the detected cellular regions. The inverse of this is then taken as to be certainly background.
+
+The algorithm works well as long as there is substantial backgorund fluorescence emitted at all locations in the cell cytoplasma. As soon as the fluorescence signal is highly localized within the cells, the algorithm may identify too much of the cells to be background. If this occurrs, the `.bg.dilate` parameter has to be increased. 
+
+### Point in Cell Identification
+
+The identification of points at every cell relies on the brightfield image and the previously determined background mask. We startoff by identifying the cell borders as a thresholded image. For this, we proceed as follows: First, the brightfield image is subjected to a Gaussian blur with parameter `.pic.blur` (default: 3). Then, OTSU thresholding is performed to create a binary image. The thresholded image is first eroded with parameter `.pic.erode` to remove small errors, and then dilated with parameter `.pic.dilate` (default: 4) to expand the thresholded image around the cell borders. The resulting image is then closed in order to close borders around cells with parameter `.pic.close` (default: 6). This yields a robust approximation of the cell borders.
+
+Based on this thresholded border image, we calculate a distance transform. This means that for every pixel that is not part of the identified border, we calculate the distance to the nearest border element. The distance transform is highest in the middle of the cell, where the distance to the closest border is maximized. We first smooth the distance transform with Gaussian blur with parameter `.pic.distsmooth` (default: 2) to avoid small irregularities in the distance transform that yield many local maxima. Then, we identify local maxima of this and determine them to be points in cells. Finally, we exclude all points we fount that are within the identified background.
+
+To this first algorithm, a second layer is added in case the previous frame was already segmented: After having identified cell centers as described above, the algorithm checks if all cells found in the previous frame have a point in them in the current layer. If that is not the case, the centroid of those "missing" cells are added to the cell points. 
+
+This algorithm works particularly well for phase contrast images. Since regular brightfield images may sometimes be too irregular in their background, the algorithm may start to fail since the cell borders no longer stand out from the background noise. In that case the user has to resort to manually identify points in cells on the first image. However, due to the second layer of the algorithm, future frames know that there has to be a cell there, and the problem is largely resolved.
+
+The algorithm moreover struggles with identifying buds at an early stage. In case early identification is important, the user has to manually add the new cells.
+
+### Cell Segmentation
+
+The cell segmentation is done using the watershed algorithm on the brightfield image. The image is first smoothed with a Gaussian filter with variance `.ws.smooth` (default: 2). Moreover, small circles with radius `.ws.center_dilate` are drawn around every identified cell point. Those circles are then used together with the identified background as seed for the watershed algorithm. 
+
+The watershed algorithm works as follows: It sets the values of the seeds to be a local minimum. It then greedily adds all pixels with a light intensity lower than a threshold that are adjacent to the seeds to the areas. The thresholds are increased, leading to growing cell areas. As soon as two cells meet, a border is created at the meeting point.
+
+This algorithm works poorly if the brightfiled image is highly irregular, such as if cellular compartments are strongly visible. In such cases, it can help to put multiple seeds for the algorithm within the same cell. In the first frame, this creates distinct cells which have to be merged manually. Later frames detect that those are just fragments of the same cell and assign them correctly.
+
+### Cell Labeling
+
+In case the previous frame doesn't have a cell segmentation, the cells are labeled with an integer. The background is also assigned a number at first, which is then changed to -1. The background number is 1 in most cases, which is why the number one is often missing as a cell ID.
+
+In case the previous cell has a cell segmentation, the algorithm compares the current segmentation with the previous one. For every region in the current frame, it counts how many of its pixels corresponded to which cell in the previous cell. It then assigns the cell number that had the most pixels in common on the previous image to the current cell. This means that in later frames, multiple cell regions can belong to the same cell. 
+
+This has one exception: If the majority detected region is the background, we assume that a budding event took place, and a new cell ID is assigned to the region.
 
 
-
- 
 
 
 
