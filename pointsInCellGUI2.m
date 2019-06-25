@@ -1,10 +1,7 @@
-function [rowi, coli] = pointsInCellGUI2(bf, bgmask, param)
-% Documentation
-%
-% erode=2, dilate=4, close=6, blur=3, distsmooth = 2
-% bfcounts = imhist(bf, 2^16);
-% bfotsu = otsuthresh(bfcounts);
-% 
+function [rowi, coli] = pointsInCellGUI2(bf, bgmask, param, demo)
+if nargin < 4
+    demo=0;
+end
 
 % Filtering
 blurred = imgaussfilt(bf, param.blur);
@@ -30,3 +27,14 @@ cellcenter = cellcenter & ~bgmask;
 
 % Return indices of cell centers
 [rowi, coli] = find(cellcenter);
+
+% If demo is activated, show intermediary images
+if demo
+    in8bit = uint8(rescale(bf, 0, 255));
+    sdr_plot = uint8(smoothdisttr*10);
+
+    figure
+    montage({in8bit, threshed, eroded, dilated, border, sdr_plot},...
+            'ThumbnailSize', uint16(size(in8bit)/2));
+end
+

@@ -1,5 +1,9 @@
-function [mask] = cellWatershedGUI2(bf, bgmask, ccRows, ccCols, param)
-% smooth, center_dilate
+function [mask] = cellWatershedGUI2(bf, bgmask, ccRows, ccCols, param, demo)
+
+if nargin < 6
+    demo=0;
+end
+
 
 % Get cellcenter mask
 imsize = size(bf);
@@ -19,5 +23,12 @@ mask = watershed(toshed_bf);
 tmp = mask(bgmask);
 bgval = tmp(1);
 mask(mask==bgval) = -1;
+
+% If demo is activated, show image and seeds
+if demo
+    in8bit = uint8(rescale(bf, 0, 255));
+    figure
+    montage({in8bit, bgmask | cellcenter_dil});
+end
 
 end
