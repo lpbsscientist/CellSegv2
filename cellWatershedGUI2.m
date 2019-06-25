@@ -1,4 +1,15 @@
 function [mask] = cellWatershedGUI2(bf, bgmask, ccRows, ccCols, param, demo)
+% Performs watershed segmentation based on the brightfield image. Uses the
+% background determined by bgmask as well as the cell points indexed by
+% ccRows and ccCols as seeds for algorithm. param is a struct with the
+% necessary parameters. demo specifies whether a figure with intermediary
+% results should be created.
+%
+% Parameters (elements of param struct):
+% smooth            (default: 2) Radius of gaussian blur to be applied to 
+%                   bright field image.
+% center_dilate     (default: 2) Radius of circle to be drawn around every
+%                   cell center before using it as seed for watershed
 
 if nargin < 6
     demo=0;

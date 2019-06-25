@@ -1,6 +1,14 @@
 function [mask] = cellCorrespondance(prev, curr)
 % Ensures that number between current and previous frame correspond
 % Prev and curr are both masks obtained with cellWatershed
+%
+% For every cell in the current frame, looks at to which cells its pixels
+% belonged in the previous frame. Then it takes the cell id with the
+% largest amount of pixels in common to be the cell number.
+%
+% Exception to this:
+% If a cell is determined to be background, it is considered
+% as a new cell and given a new id. 
 
 
 allCurrCells = unique(curr)';
@@ -24,45 +32,20 @@ for cell = allCurrCells
     counts = histcounts(catPrev(curr==cell), catAllPrevCells); 
     [maxCounts, maxCountIx] = max(counts);
     
-%     % Check if new cell (i.e. matches to background), set it to max+1
-      corr = allPrevCells(maxCountIx);
+    % Check if new cell (i.e. matches to background), set it to max+1
+    corr = allPrevCells(maxCountIx);
     if corr <= 0
         corresp(cell) = max([allPrevCells, corresp']) + 1;
     else
         corresp(cell) = corr;
     end
+    
     % commenting the above snippet creates a memory of background
     % corresp(cell) = corr;
     allMaxCounts(cell) = maxCounts;
 end
 
-% % Ensure one-to-one mapping
-% for cell = allPrevCells
-%      % Disregard bg and border
-%     if cell <= 0
-%         continue
-%     end
-% 
-%     ix = find(corresp == cell);
-%     
-%     % Handle case that more than one map to the same previous cell
-%     if length(ix) > 1
-%         [~, maxix] = max(allMaxCounts(ix));
-%         nomaxix = ix(ix ~= maxix);
-%         
-%         % Change those index that don't cover the maximal area of the
-%         % previous cell to a new index
-%         for i = nomaxix
-%             corresp(i) = max(corresp) + 1;
-%         end
-%     end
-%     
-%     % Handle case that no cell maps to previous cell
-%     if isempty(ix)
-%         % TODO: What?
-%     end
-% end
-%     
+
 % Change the current values of cells
 mask = curr;
 for cell = allCurrCells

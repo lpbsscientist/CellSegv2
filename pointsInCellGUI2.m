@@ -1,4 +1,24 @@
 function [rowi, coli] = pointsInCellGUI2(bf, bgmask, param, demo)
+% Using brightfield image, determines points that lie within cells. Points
+% that are within the background, as determined by bgmask, are excluded.
+% param contains all necessary parameters for the image processing
+% operations. demo specifies whether a plot with all intermediary steps
+% should be created.
+%
+% Parameters (elements of param struct):
+% .blur     (default: 3) Determines blur of gaussian filter on brightfield
+%           image
+% .erode    (default: 2) Radius of erode operation, removes small noise
+% .dilate   (default: 4) Adds to thresholded image, make sure we have the
+%           entire border
+% .close    (default: 6) Parameter of close operation, to connect almost
+%           closed borders
+% .distsmooth (default: 2) Smooth distance transform, to avoid multiple 
+%           maxima that are too close together. Allows for small
+%           non-convexities.
+
+
+
 if nargin < 4
     demo=0;
 end

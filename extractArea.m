@@ -1,7 +1,9 @@
 function [out] = extractArea(filename, r, z, c)
 % Extracts total area of cells over time at a given region r,
 % z-position z and channel c. filename has to be the name of a file created
-% using cellSeg2.
+% using cellSeg2. Returns a matrix with rows corresponding to the unique
+% cell ID also shown on the plot, and the columns corresponding to time
+% steps. 
 
 file = matfile(filename);
 areaInfo = file.cellArea;
