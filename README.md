@@ -96,13 +96,15 @@ The leftmost menu panel is related to selecting the displayed frame. You can cha
 
 ### Point Detection
 
-Everytime a new frame is opened, the algorithm detects points in the cells. These points are then used as seeds for the segmentation algorithm, meaning that they are the start of cell detection. Whereas on the first frame every point will create an individual cell, in later timeframes multiple points can correspond to the same cell. This means that especially on later frames it is no problem if one cell has multiple points. It is more desireable on the first frame, but since one can easily merge cells it is not of utmost importance either.
+Everytime a new frame is opened, the algorithm detects points in the cells. These points are then used as seeds for the segmentation algorithm, meaning that they are the start of cell detection. Whereas on the first frame every point will create an individual cell, in later timeframes multiple points can correspond to the same cell. This means that especially on later frames it is no problem if one cell has multiple points. It is more desireable on the first frame, but since one can easily merge cells it is not of utmost importance either. However, it is very important that every cell contains at least one point. In particular, the automatic detection algorithm sometimes fails to detect early buds, which makes human interference necessary. 
+
+The point identification works better if you segmented the previous frame. If you want to recalculate the point positions after having properly segmented the previous frame, you can do so by clicking **Redetect**. 
 
 However, it is very important that every cell contains at least one point. In particular, the automatic detection algorithm sometimes fails to detect early buds, which makes human interference necessary. 
 
-In order to add a point to the image, select the **Add Point** option. Then left-click on the screen where you want to add the point. Right click to abort the point addition. 
+In order to add a point to the image, select the **Add Point** option. Then left-click on the screen where you want to add the point. Keep left-clicking to keep adding points, and right-click to stop adding points.
 
-In order to remove a point from the image, select the **Remove Point** option. Then left-click on the screen _near_ the point you want to delete. The program will delete the point closest to the click location. Right click to abort the point removal. Note that Matlab 2019a makes it possible to select the points. However, point selection is not detected as a click on the image, so click to a point close to the point to delete, but not on the point itself.
+In order to remove a point from the image, select the **Remove Point** option. Then left-click on the screen _near_ the point you want to delete. The program will delete the point closest to the click location. Right click to abort the point removal. Again, keep left-clicking to continuously add points, and right-click to stop. Note that Matlab 2019a makes it possible to select the points. However, point selection is not detected as a click on the image, so click to a point close to the point to delete, but not on the point itself.
 
 You can toggle the point display on and off using the **Show Points** checkbox. 
 
