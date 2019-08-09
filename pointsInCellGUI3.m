@@ -20,7 +20,7 @@ end
 smoothdisttr = imgaussfilt(dtr, param.distsmooth);
 
 % Find maxima with minimal distance between them
-hmaxtransf = imhmax(smoothdisttr, 2);
+hmaxtransf = imhmax(dtr, 1);
 cellcenter = imregionalmax(hmaxtransf);
 
 % Remove those points that are on background

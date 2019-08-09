@@ -26,7 +26,8 @@ end
 cellcenter_dil = imdilate(cellcenter, strel('disk', param.center_dilate));
 
 % Subtract distance transform from brightfield to get watershed topology
-topo = single(bf) - dtr;
+topo = single(bf);
+topo(~bgmask) = topo(~bgmask) - 20*dtr(~bgmask);
 
 % Smooth topology, run watershet
 smooth_bf = imgaussfilt(topo, param.smooth);
