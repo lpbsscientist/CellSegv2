@@ -36,10 +36,12 @@ eroded = imerode(threshed, strel('disk', param.erode));
 dilated = imdilate(eroded, strel('disk', param.dilate));
 border = imclose(dilated, strel('disk', param.close));
 
+% Distance transform
 disttr = bwdist(border);
 smoothdisttr = imgaussfilt(disttr, param.distsmooth);
 
-% Distance transform
+% Find maxima with minimal distance between them
+a = imdilate(smoothdisttr, offsetstrel('ball',5,5));
 cellcenter = imregionalmax(smoothdisttr);
 
 % Remove those points that are on background
