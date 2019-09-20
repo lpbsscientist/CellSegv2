@@ -32,13 +32,13 @@ topo(~bgmask) = topo(~bgmask) - 20*dtr(~bgmask);
 % Smooth topology, run watershet
 smooth_bf = imgaussfilt(topo, param.smooth);
 toshed_bf = imimposemin(smooth_bf, bgmask | cellcenter_dil);
-mask = watershed(toshed_bf);
+mask = uint16(watershed(toshed_bf));
 
 % Set value of background to -1
 tmp = mask(bgmask);
 bgvals = unique(tmp);
 for val=bgvals'
-    mask(mask==val) = -1;
+    mask(mask==val) = 0;
 end
 
 % If demo is activated, show image and seeds
