@@ -36,8 +36,10 @@ mask = watershed(toshed_bf);
 
 % Set value of background to -1
 tmp = mask(bgmask);
-bgval = tmp(1);
-mask(mask==bgval) = -1;
+bgvals = unique(tmp);
+for val=bgvals'
+    mask(mask==val) = -1;
+end
 
 % If demo is activated, show image and seeds
 if demo

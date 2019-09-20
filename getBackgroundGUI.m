@@ -16,7 +16,7 @@ if nargin<4
 end
 
 smoothed = imgaussfilt(fluo, param.smoothing);
-vignette = imgaussfilt(smoothed, param.smoothing * 100);
+vignette = imgaussfilt(firstfluo, param.smoothing * 100);
 corrected = int32(smoothed) - int32(vignette);
 positive = int16(corrected - min(corrected, [], 'all'));
 
@@ -26,7 +26,9 @@ gfpotsu = otsuthresh(gfpcounts);
 
 % Binarize and dilate
 bin = imbinarize(positive, gfpotsu);
-mask = ~imdilate(bin, strel('disk', param.dilate));
+%mask = ~imdilate(bin, strel('disk', param.dilate));
+% Changed for BF
+mask = ~imdilate(bin, strel('disk', param.dilate*10));
 
 % If demo is activated, show intermediary images
 if demo
