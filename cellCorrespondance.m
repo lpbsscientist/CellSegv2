@@ -10,51 +10,40 @@ function [mask] = cellCorrespondance(prev, curr)
 % If a cell is determined to be background, it is considered
 % as a new cell and given a new id. 
 
+% Notes for improvement: By far the most time is spent on getting the
+% counts. Could be made faster by subsampling the map.
 
-allCurrCells = unique(curr)';
-allPrevCells = unique(prev)';
+map = [prev(:), curr(:)];
+[unique_rows,~,ix] = unique(map, 'rows');
+counts = histcounts(categorical(ix), categorical(1:max(ix)));
 
-% Convert to categorical for getting counts
-catPrev = categorical(prev);
-catAllPrevCells = categorical(allPrevCells);
+% Group by current cell, find cell from previous with the largest overlap
+[g, oldval] = findgroups(unique_rows(:,2));
+newval = splitapply(@inner, counts', unique_rows(:,1), g);
 
-% Obtain for every cell in the curr frame the cell in the previous frame
-% which has the most area in common
-corresp = zeros(max(allCurrCells), 1);
-allMaxCounts = zeros(max(allCurrCells), 1);
-for cell = allCurrCells
-    % Disregard bg and border
-    if cell <= 0
+% When the new value is zero, create a new cell
+new_is_zero = find(newval==0);
+new_ix = max(newval) + 1;
+for cell=new_is_zero'
+    if oldval(cell)==0
+        % Leave background as background
         continue
     end
-    
-    % Get number of counts 
-    counts = histcounts(catPrev(curr==cell), catAllPrevCells); 
-    [maxCounts, maxCountIx] = max(counts);
-    
-    % Check if new cell (i.e. matches to background), set it to max+1
-    corr = allPrevCells(maxCountIx);
-    if corr <= 0
-        corresp(cell) = max([allPrevCells, corresp']) + 1;
-    else
-        corresp(cell) = corr;
-    end
-    
-    % commenting the above snippet creates a memory of background
-    % corresp(cell) = corr;
-    allMaxCounts(cell) = maxCounts;
+    newval(cell)=new_ix;
+    new_ix = new_ix+1;
+end
+
+% Exchange values in curr to form final mask using a lookup table, where
+% entry n+1 specifies the new value corresponding to the old value n.
+lookup = zeros(max(oldval+1),1);
+lookup(oldval+1) = newval;
+mask = lookup(curr+1);
+
 end
 
 
-% Change the current values of cells
-mask = curr;
-for cell = allCurrCells
-    % Disregard bg and border
-    if cell <= 0
-        continue
-    end
-
-    mask(curr==cell) = corresp(cell);
-end
-
+function out = inner(c, v)
+% Takes counts and values, returns value with highest count
+[~, maxix] = max(c);
+out = v(maxix);
 end

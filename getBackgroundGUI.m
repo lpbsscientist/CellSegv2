@@ -1,4 +1,4 @@
-function [mask] = getBackgroundGUI(fluo, firstfluo, param, demo)
+function [mask] = getBackgroundGUI(im, vignette, param, demo)
 % Identifies regions which we are sure to be background. Requires
 % fluorescence image where cells exhibit a lot of background fluorescence
 % and cell bodies can be distinguished from the background by eye. 
@@ -15,8 +15,7 @@ if nargin<4
     demo=0;
 end
 
-smoothed = imgaussfilt(fluo, param.smoothing);
-vignette = imgaussfilt(firstfluo, param.smoothing * 100);
+smoothed = imgaussfilt(im, param.smoothing);
 corrected = int32(smoothed) - int32(vignette);
 positive = int16(corrected - min(corrected, [], 'all'));
 
@@ -26,13 +25,13 @@ gfpotsu = otsuthresh(gfpcounts);
 
 % Binarize and dilate
 bin = imbinarize(positive, gfpotsu);
-%mask = ~imdilate(bin, strel('disk', param.dilate));
+
 % Changed for BF
 mask = ~imdilate(bin, strel('disk', param.dilate*10));
 
 % If demo is activated, show intermediary images
 if demo
-    in8bit = uint8(rescale(fluo, 0, 255));
+    in8bit = uint8(rescale(im, 0, 255));
 
     figure
     montage({in8bit, bin, mask},...
