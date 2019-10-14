@@ -1,0 +1,15 @@
+S - Segment
+A - Add point
+R - Remove Point
+M - Merge Regions
+B - Brush Draw
+Z - Zoom
+P - Pan
+L - Change Label
+D - Redraw Cell
+N - New Cell in Area
+T - Add To Region
+
+Uparrow - Go to next frame
+Downarrow - Go to previous frame
+
