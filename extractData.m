@@ -1,4 +1,7 @@
 function [] = extractData(filename, outfile_mask, outfile_im, region)
+% Function to extract segmentation masks and the corresponding nd2 frames
+% simultaeously for a given region. The frames are saved in the tif files
+% specified in outfile_mask and outfile_im (WHICH MUST HAVE ENDING .tif).
 file = matfile(filename);
 
 meta = file.meta;
